@@ -1,0 +1,14 @@
+
+> pg-manager@0.1.0 start
+> next start
+
+   ▲ Next.js 15.5.28
+   - Local:        http://localhost:3000
+   - Network:      http://10.1.0.55:3000
+
+ ✓ Starting...
+ ✓ Ready in 358ms
+[reminder] to 9876500003: Hi Karan, a gentle reminder that your Sunrise PG rent for Sep 2026 of ₹8,742 was due on 5 Sep 2026. | Pay by UPI here: http://localhost:3000/pay/_31vYtFw3t_ODpmMM1VGatLF | Thank you!
+[reminder] to 9876500004: Hi Vikas, a gentle reminder that your Sunrise PG rent for Sep 2026 of ₹3,750 was due on 5 Sep 2026. | Pay by UPI here: http://localhost:3000/pay/4JcYdB_Ty-c0R4dI81kiERY7 | Thank you!
+[reminder] to 9876500003: Hi Karan, a gentle reminder that your Sunrise PG rent for Oct 2026 of ₹7,910 was due on 5 Oct 2026. | Pay by UPI here: http://localhost:3000/pay/fbvpT3Auewn7CW7hqBY1FjqR | Thank you!
+[reminder] to 9876500004: Hi Vikas, a gentle reminder that your Sunrise PG rent for Oct 2026 of ₹7,909 was due on 5 Oct 2026. | Pay by UPI here: http://localhost:3000/pay/K4NaNEfWhO85wPi_9bUgsROA | Thank you!

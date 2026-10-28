@@ -1,0 +1,5 @@
+
+> pg-manager@0.1.0 db:seed
+> tsx prisma/seed.ts
+
+Seeded Sunrise PG: login demo@pgmanager.in / demo1234

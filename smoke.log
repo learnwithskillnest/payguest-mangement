@@ -1,0 +1,30 @@
+
+> pg-manager@0.1.0 smoke
+> node scripts/smoke.mjs
+
+ok   200 /
+ok   200 /login
+ok   200 /signup
+ok   307 /dashboard
+ok   200 /dashboard
+ok   200 /rooms
+ok   200 /tenants
+ok   200 /tenants?tab=past
+ok   200 /tenants?tab=pending
+ok   200 /tenants/new
+ok   200 /tenants/cmvrpkv0a000o0dl5sye2mh5o
+ok   200 /tenants/cmvrpkv0k001c0dl5sejjcs6g
+ok   200 /rent
+ok   200 /rent/cmvrpkv5e005k0dl5slhcja3r
+ok   200 /receipts/cmvrpkv5p005u0dl5kbfmpuqe
+ok   200 /electricity
+ok   200 /expenses
+ok   200 /reports
+ok   200 /settings
+ok   200 /pay/K4NaNEfWhO85wPi_9bUgsROA
+ok   200 /pay/WMyIiQVIAwQofSAaeZBVzeTP/receipt/cmvrpkv5p005u0dl5kbfmpuqe
+ok   404 /pay/not-a-real-token
+ok   401 /api/cron/reminders
+ok   200 /api/cron/reminders
+ok   200 /api/health
+All smoke checks passed

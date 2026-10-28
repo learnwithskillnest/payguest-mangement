@@ -1,0 +1,27 @@
+
+> pg-manager@0.1.0 test
+> vitest run
+
+
+[1m[46m RUN [49m[22m [36mv3.2.7 [39m[90m/home/runner/work/payguest-mangement/payguest-mangement[39m
+
+[90mstdout[2m | tests/services.test.ts[2m > [22m[2mservices (database)[2m > [22m[2msends each due reminder once per day
+[22m[39m[reminder] to 9999999999: Hi Joiner, a gentle reminder that your Test PG rent for Sep 2026 of ₹3,000 was due on 5 Sep 2026. | Pay by UPI here: http://localhost:3000/pay/kiMVSN63g6ESL2vUuG6AjmSs | Thank you!
+
+[90mstdout[2m | tests/services.test.ts[2m > [22m[2mservices (database)[2m > [22m[2msends each due reminder once per day
+[22m[39m[reminder] to 9999999999: Hi Leaver, a gentle reminder that your Test PG rent for Sep 2026 of ₹2,000 was due on 5 Sep 2026. | Pay by UPI here: http://localhost:3000/pay/nIVHDEspeOdLXcyt07__rEZP | Thank you!
+
+[90mstdout[2m | tests/services.test.ts[2m > [22m[2mservices (database)[2m > [22m[2msends each due reminder once per day
+[22m[39m[reminder] to 9999999999: Hi Full, a gentle reminder that your Test PG rent for Oct 2026 of ₹9,300 was due on 5 Oct 2026. | Pay by UPI here: http://localhost:3000/pay/vbdp21B0zZ4exALZhCVCqoDQ | Thank you!
+
+[90mstdout[2m | tests/services.test.ts[2m > [22m[2mservices (database)[2m > [22m[2msends each due reminder once per day
+[22m[39m[reminder] to 9999999999: Hi Joiner, a gentle reminder that your Test PG rent for Oct 2026 of ₹9,100 was due on 5 Oct 2026. | Pay by UPI here: http://localhost:3000/pay/qGvOm_PjG6lQSZHhI-HjJBFq | Thank you!
+
+ [32m✓[39m tests/services.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 145[2mms[22m[39m
+ [32m✓[39m tests/billing.test.ts [2m([22m[2m20 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+[2m      Tests [22m [1m[32m25 passed[39m[22m[90m (25)[39m
+[2m   Start at [22m 06:03:13
+[2m   Duration [22m 596ms[2m (transform 96ms, setup 0ms, collect 157ms, tests 160ms, environment 0ms, prepare 78ms)[22m
+

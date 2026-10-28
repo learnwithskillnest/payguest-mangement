@@ -1,0 +1,14 @@
+
+> pg-manager@0.1.0 e2e
+> playwright test
+
+
+Running 4 tests using 2 workers
+
+  -  1 [desktop] › e2e/screenshots.spec.ts:9:7 › screens desktop
+  -  2 [desktop] › e2e/screenshots.spec.ts:9:7 › screens mobile
+  ✓  3 [desktop] › e2e/owner-flow.spec.ts:5:5 › owner sets up a PG, adds a tenant, bills rent and records a payment (3.2s)
+  ✓  4 [desktop] › e2e/owner-flow.spec.ts:117:5 › protects the dashboard and rejects bad logins (286ms)
+
+  2 skipped
+  2 passed (5.2s)
