@@ -98,7 +98,7 @@ test("owner sets up a PG, adds a tenant, bills rent and records a payment", asyn
   await page.getByRole("button", { name: "Add expense" }).click();
   await expect(page.getByText("₹3,000 expense added.")).toBeVisible();
   await page.goto("/reports");
-  await expect(page.getByText("Month by month")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Month by month" })).toBeVisible();
 
   // Tenant gives notice → bed shows free-from date
   await page.goto("/rooms");
