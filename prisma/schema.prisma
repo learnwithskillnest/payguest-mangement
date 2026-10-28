@@ -1,0 +1,314 @@
+// PG Manager — data model
+// Money is stored in whole rupees (Int). Calendar dates are stored as @db.Date (UTC midnight).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String     @id @default(cuid())
+  name         String
+  email        String     @unique
+  phone        String?
+  passwordHash String
+  createdAt    DateTime   @default(now())
+  properties   Property[]
+  sessions     Session[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Property {
+  id                  String   @id @default(cuid())
+  ownerId             String
+  owner               User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  name                String
+  address             String?
+  city                String?
+  phone               String?
+  // Payments
+  upiVpa              String?  // e.g. owner@okhdfcbank
+  upiPayeeName        String?
+  rentDueDay          Int      @default(5)
+  // Electricity
+  electricityRate     Float    @default(8) // rupees per unit for sub-meters
+  // Reminders
+  remindersEnabled    Boolean  @default(true)
+  reminderDaysBefore  Int      @default(2)
+  reminderRepeatDays  Int      @default(3)
+  // Receipts
+  receiptPrefix       String   @default("RCPT")
+  receiptCounter      Int      @default(0)
+  createdAt           DateTime @default(now())
+
+  rooms     Room[]
+  tenants   Tenant[]
+  invoices  Invoice[]
+  expenses  Expense[]
+  payments  Payment[]
+
+  @@index([ownerId])
+}
+
+model Room {
+  id          String         @id @default(cuid())
+  propertyId  String
+  property    Property       @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  name        String         // "101", "Ground floor - A"
+  floor       String?
+  hasSubMeter Boolean        @default(true)
+  createdAt   DateTime       @default(now())
+  beds        Bed[]
+  readings    MeterReading[]
+
+  @@unique([propertyId, name])
+}
+
+model Bed {
+  id        String   @id @default(cuid())
+  roomId    String
+  room      Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  label     String   // "A", "B", "Window"
+  rent      Int      // default monthly rent for this bed
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  stays     Stay[]
+
+  @@unique([roomId, label])
+}
+
+enum TenantStatus {
+  ACTIVE
+  NOTICE
+  MOVED_OUT
+}
+
+enum PoliceVerification {
+  NOT_STARTED
+  SUBMITTED
+  VERIFIED
+  REJECTED
+}
+
+model Tenant {
+  id                    String             @id @default(cuid())
+  propertyId            String
+  property              Property           @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  name                  String
+  phone                 String
+  email                 String?
+  occupation            String?            // Student / Working professional
+  organisation          String?            // College or company
+  permanentAddress      String?
+  emergencyContactName  String?
+  emergencyContactPhone String?
+  idType                String?            // Aadhaar, PAN, DL, Passport, Voter ID
+  idNumber              String?            // Aadhaar is stored masked
+  policeVerification    PoliceVerification @default(NOT_STARTED)
+  policeVerificationRef String?
+  policeVerifiedOn      DateTime?          @db.Date
+  agreementStart        DateTime?          @db.Date
+  agreementEnd          DateTime?          @db.Date
+  depositAmount         Int                @default(0)
+  depositReceived       Int                @default(0)
+  depositReceivedOn     DateTime?          @db.Date
+  depositDeduction      Int                @default(0)
+  depositDeductionNote  String?
+  depositRefunded       Int                @default(0)
+  depositRefundedOn     DateTime?          @db.Date
+  status                TenantStatus       @default(ACTIVE)
+  notes                 String?
+  createdAt             DateTime           @default(now())
+
+  stays              Stay[]
+  documents          Document[]
+  invoices           Invoice[]
+  electricityShares  ElectricityShare[]
+
+  @@index([propertyId, status])
+}
+
+// One continuous stay of a tenant in a bed. endDate is the last night (inclusive);
+// a future endDate means the tenant is on notice and the bed frees up the day after.
+model Stay {
+  id        String    @id @default(cuid())
+  tenantId  String
+  tenant    Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  bedId     String
+  bed       Bed       @relation(fields: [bedId], references: [id], onDelete: Restrict)
+  startDate DateTime  @db.Date
+  endDate   DateTime? @db.Date
+  rent      Int
+  createdAt DateTime  @default(now())
+
+  @@index([bedId])
+  @@index([tenantId])
+}
+
+enum DocumentType {
+  ID_PROOF
+  PHOTO
+  AGREEMENT
+  POLICE_VERIFICATION
+  OTHER
+}
+
+model Document {
+  id         String       @id @default(cuid())
+  tenantId   String
+  tenant     Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  type       DocumentType
+  fileName   String
+  storedName String       @unique
+  mimeType   String
+  size       Int
+  uploadedAt DateTime     @default(now())
+}
+
+model Invoice {
+  id                String             @id @default(cuid())
+  propertyId        String
+  property          Property           @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  tenantId          String
+  tenant            Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  period            String             // "2026-10"
+  rentAmount        Int
+  electricityAmount Int                @default(0)
+  otherAmount       Int                @default(0)
+  otherNote         String?
+  discount          Int                @default(0)
+  totalAmount       Int
+  dueDate           DateTime           @db.Date
+  publicToken       String             @unique
+  // Tenant-submitted "I've paid" claim, awaiting owner confirmation
+  claimAmount       Int?
+  claimRef          String?
+  claimedAt         DateTime?
+  createdAt         DateTime           @default(now())
+
+  payments          Payment[]
+  reminders         Reminder[]
+  electricityShares ElectricityShare[]
+
+  @@unique([tenantId, period])
+  @@index([propertyId, period])
+}
+
+enum PaymentMethod {
+  UPI
+  CASH
+  BANK_TRANSFER
+  CHEQUE
+  OTHER
+}
+
+model Payment {
+  id         String        @id @default(cuid())
+  propertyId String
+  property   Property      @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  invoiceId  String
+  invoice    Invoice       @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  amount     Int
+  method     PaymentMethod
+  reference  String?       // UPI transaction ID / UTR
+  paidOn     DateTime      @db.Date
+  receiptNo  String
+  note       String?
+  createdAt  DateTime      @default(now())
+
+  @@unique([propertyId, receiptNo])
+  @@index([propertyId, paidOn])
+}
+
+enum ReminderChannel {
+  WHATSAPP_MANUAL
+  WHATSAPP_API
+  WEBHOOK
+  LOG
+}
+
+model Reminder {
+  id        String          @id @default(cuid())
+  invoiceId String
+  invoice   Invoice         @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  channel   ReminderChannel
+  success   Boolean         @default(true)
+  error     String?
+  message   String
+  sentAt    DateTime        @default(now())
+
+  @@index([invoiceId, sentAt])
+}
+
+enum ExpenseCategory {
+  ELECTRICITY
+  WATER
+  FOOD
+  STAFF_SALARY
+  RENT
+  MAINTENANCE
+  INTERNET
+  CLEANING
+  OTHER
+}
+
+model Expense {
+  id         String          @id @default(cuid())
+  propertyId String
+  property   Property        @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  category   ExpenseCategory
+  amount     Int
+  date       DateTime        @db.Date
+  paidTo     String?
+  note       String?
+  createdAt  DateTime        @default(now())
+
+  @@index([propertyId, date])
+}
+
+// Sub-meter reading for a room for one usage month. The bill is split across the
+// room's occupants by days stayed and charged on each tenant's next invoice.
+model MeterReading {
+  id              String             @id @default(cuid())
+  roomId          String
+  room            Room               @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  period          String             // usage month, "2026-10"
+  previousReading Float
+  currentReading  Float
+  rate            Float
+  units           Float
+  amount          Int
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  shares          ElectricityShare[]
+
+  @@unique([roomId, period])
+}
+
+model ElectricityShare {
+  id             String       @id @default(cuid())
+  meterReadingId String
+  meterReading   MeterReading @relation(fields: [meterReadingId], references: [id], onDelete: Cascade)
+  tenantId       String
+  tenant         Tenant       @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  days           Int
+  amount         Int
+  invoiceId      String?      // set once billed on an invoice
+  invoice        Invoice?     @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+
+  @@unique([meterReadingId, tenantId])
+}

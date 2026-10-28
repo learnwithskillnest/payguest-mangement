@@ -1,0 +1,88 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: pg
+          POSTGRES_PASSWORD: pg
+          POSTGRES_DB: pgmanager
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U pg" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgresql://pg:pg@localhost:5432/pgmanager
+      APP_URL: http://localhost:3000
+      CRON_SECRET: ci-secret
+      UPLOAD_DIR: ./uploads
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install
+        run: |
+          set -o pipefail
+          if [ -f package-lock.json ]; then npm ci 2>&1 | tee install.log; else npm install 2>&1 | tee install.log; fi
+
+      - name: Database schema
+        run: npx prisma db push --skip-generate 2>&1 | tee db.log
+
+      - name: Typecheck
+        id: typecheck
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          npx next typegen > /dev/null 2>&1 || true
+          npm run typecheck 2>&1 | tee typecheck.log
+
+      - name: Tests
+        id: tests
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          npm test 2>&1 | tee test.log
+
+      - name: Build
+        id: build
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          npm run build 2>&1 | tee build.log
+
+      - name: Smoke test
+        id: smoke
+        if: steps.build.outcome == 'success'
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          npx prisma db push --force-reset --skip-generate > /dev/null
+          npm run db:seed 2>&1 | tee seed.log
+          (npm start > server.log 2>&1 &)
+          for i in $(seq 1 30); do curl -sf http://localhost:3000/api/health > /dev/null && break; sleep 1; done
+          npm run smoke 2>&1 | tee smoke.log
+
+      - name: Publish logs (dev branch)
+        if: always() && github.ref_name == 'dev'
+        run: |
+          mkdir -p /tmp/ci && cp *.log /tmp/ci/ 2>/dev/null || true
+          cp package-lock.json /tmp/ci/ 2>/dev/null || true
+          printf "typecheck=%s\ntests=%s\nbuild=%s\nsmoke=%s\nsha=%s\n" "${{ steps.typecheck.outcome }}" "${{ steps.tests.outcome }}" "${{ steps.build.outcome }}" "${{ steps.smoke.outcome }}" "${{ github.sha }}" > /tmp/ci/summary.txt
+          cd /tmp/ci && git init -q && git checkout -q -b ci-logs && git add -A
+          git -c user.name=ci -c user.email=ci@localhost commit -qm "CI logs for ${{ github.sha }}"
+          git push -qf "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" ci-logs
+
+      - name: Fail if any check failed
+        if: steps.typecheck.outcome != 'success' || steps.tests.outcome != 'success' || steps.build.outcome != 'success' || steps.smoke.outcome != 'success'
+        run: exit 1
