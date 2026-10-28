@@ -85,6 +85,7 @@ jobs:
             for i in $(seq 1 30); do curl -sf http://localhost:3000/api/health > /dev/null && break; sleep 1; done
           fi
           npm run e2e 2>&1 | tee e2e.log
+          SCREENSHOTS=1 npx playwright test e2e/screenshots.spec.ts --output=screens-results > screens.log 2>&1 || true
 
       - name: Publish logs (dev branch)
         if: always() && github.ref_name == 'dev'
@@ -92,7 +93,7 @@ jobs:
           mkdir -p /tmp/ci && cp *.log /tmp/ci/ 2>/dev/null || true
           cp package-lock.json /tmp/ci/ 2>/dev/null || true
           cp server.log /tmp/ci/ 2>/dev/null || true
-          find test-results -name '*.png' -exec cp {} /tmp/ci/ \; 2>/dev/null || true
+          find test-results screens -name '*.png' -exec cp {} /tmp/ci/ \; 2>/dev/null || true
           printf "typecheck=%s\ntests=%s\nbuild=%s\nsmoke=%s\ne2e=%s\nsha=%s\n" "${{ steps.typecheck.outcome }}" "${{ steps.tests.outcome }}" "${{ steps.build.outcome }}" "${{ steps.smoke.outcome }}" "${{ steps.e2e.outcome }}" "${{ github.sha }}" > /tmp/ci/summary.txt
           cd /tmp/ci && git init -q && git checkout -q -b ci-logs && git add -A
           git -c user.name=ci -c user.email=ci@localhost commit -qm "CI logs for ${{ github.sha }}"
