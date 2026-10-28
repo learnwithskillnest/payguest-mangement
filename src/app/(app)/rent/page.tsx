@@ -108,7 +108,38 @@ export default async function RentPage({ searchParams }: { searchParams: SearchP
         {shown.length === 0 ? (
           <Empty>{invoices.length === 0 ? `No invoices for ${fmtPeriod(month)} yet.` : "Nothing to show."}</Empty>
         ) : (
-          <div className="-m-4 overflow-x-auto">
+          <>
+          <ul className="-m-4 divide-y divide-stone-100 sm:hidden">
+            {shown.map((i) => (
+              <li key={i.id} className="flex flex-col gap-2 p-4">
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <Link href={`/rent/${i.id}`} className="link">{i.tenant.name}</Link>
+                    <div className="text-xs text-stone-500">
+                      Rent {rupees(i.rentAmount)}{i.electricityAmount ? ` + electricity ${rupees(i.electricityAmount)}` : ""}
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-semibold tabular-nums">{rupees(i.balance || i.totalAmount)}</div>
+                    <StatusBadge status={i.status} />
+                  </div>
+                </div>
+                {i.claimedAt && <div><Badge tone="blue">Says paid</Badge></div>}
+                {i.balance > 0 ? (
+                  <div className="flex gap-2">
+                    <form action={whatsappReminder} className="flex-1">
+                      <input type="hidden" name="invoiceId" value={i.id} />
+                      <button className="btn-secondary w-full">Remind</button>
+                    </form>
+                    <Link href={`/rent/${i.id}#pay`} className="btn flex-1">Record payment</Link>
+                  </div>
+                ) : (
+                  <Link href={`/rent/${i.id}`} className="btn-secondary">Receipt</Link>
+                )}
+              </li>
+            ))}
+          </ul>
+          <div className="-m-4 hidden overflow-x-auto sm:block">
             <table>
               <thead>
                 <tr><th>Tenant</th><th className="text-right">Rent</th><th className="text-right">Electricity</th><th className="text-right">Total</th><th className="text-right">Balance</th><th>Status</th><th /></tr>
@@ -146,6 +177,7 @@ export default async function RentPage({ searchParams }: { searchParams: SearchP
               </tbody>
             </table>
           </div>
+          </>
         )}
       </Card>
     </>

@@ -97,6 +97,9 @@ export default async function TenantsPage({ searchParams }: { searchParams: Sear
                       </td>
                       <td>
                         {stay ? `${stay.bed.room.name}-${stay.bed.label}` : "—"}
+                        {stay && stay.startDate > t && (
+                          <div className="text-xs text-sky-700">Moves in {fmtDate(stay.startDate)}</div>
+                        )}
                         {x.status === "NOTICE" && stay?.endDate && (
                           <div className="text-xs text-amber-700">Leaving {fmtDate(stay.endDate)}</div>
                         )}

@@ -8,7 +8,7 @@ export type RoomView = { id: string; name: string; floor: string | null; hasSubM
 export async function getBedBoard(propertyId: string, onDate: Date = today()) {
   const rooms = await db.room.findMany({
     where: { propertyId },
-    orderBy: [{ floor: "asc" }, { name: "asc" }],
+    orderBy: { name: "asc" },
     include: {
       beds: {
         orderBy: { label: "asc" },

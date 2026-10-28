@@ -18,7 +18,7 @@ export default async function ElectricityPage({ searchParams }: { searchParams: 
 
   const rooms = await db.room.findMany({
     where: { propertyId: property.id, hasSubMeter: true },
-    orderBy: [{ floor: "asc" }, { name: "asc" }],
+    orderBy: { name: "asc" },
     include: {
       readings: {
         where: { period: month },
@@ -103,6 +103,8 @@ export default async function ElectricityPage({ searchParams }: { searchParams: 
                                 {s.tenant.name}: <strong>{rupees(s.amount)}</strong> ({s.days}d){" "}
                                 {s.invoice ? (
                                   <Link href={`/rent/${s.invoice.id}`} className="text-brand-700">on {fmtPeriod(s.invoice.period)} rent</Link>
+                                ) : s.tenant.status === "MOVED_OUT" ? (
+                                  <Link href={`/tenants/${s.tenantId}`} className="text-amber-700">moved out · settle from deposit</Link>
                                 ) : (
                                   <span className="text-amber-700">next invoice</span>
                                 )}

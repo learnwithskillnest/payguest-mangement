@@ -124,7 +124,7 @@ async function main() {
     const due = dueDateFor(inv.period, property.rentDueDay);
     const isCurrent = inv.period === month;
     const isLast = inv.period === m(-1);
-    if (isCurrent && !["Aman Verma", "Ankit Singh", "Nikhil Rao"].includes(inv.tenant.name)) continue;
+    if (isCurrent && ["Karan Mehta", "Vikas Yadav", "Arjun Nair"].includes(inv.tenant.name)) continue;
     if (isLast && inv.tenant.name === "Karan Mehta") continue; // overdue from last month
     const paidOn = addDays(due, -2 + Math.floor(Math.random() * 5));
     const amount = isLast && inv.tenant.name === "Vikas Yadav" ? Math.round(inv.totalAmount / 2) : inv.totalAmount;
@@ -143,14 +143,14 @@ async function main() {
   }
 
   const expenseTemplate = [
-    { category: "FOOD", amount: 38000, day: 3, paidTo: "Grocery wholesaler" },
-    { category: "STAFF_SALARY", amount: 14000, day: 1, paidTo: "Cook (Ramesh)" },
-    { category: "STAFF_SALARY", amount: 9000, day: 1, paidTo: "Cleaner (Sunita)" },
-    { category: "ELECTRICITY", amount: 16500, day: 12, paidTo: "UPPCL" },
-    { category: "WATER", amount: 1800, day: 8, paidTo: "Water tanker" },
-    { category: "INTERNET", amount: 2400, day: 5, paidTo: "Airtel Xstream" },
-    { category: "RENT", amount: 35000, day: 7, paidTo: "Building owner" },
-    { category: "MAINTENANCE", amount: 2200, day: 18, paidTo: "Plumber" },
+    { category: "FOOD", amount: 21000, day: 3, paidTo: "Grocery wholesaler" },
+    { category: "STAFF_SALARY", amount: 12000, day: 1, paidTo: "Cook (Ramesh)" },
+    { category: "STAFF_SALARY", amount: 7000, day: 1, paidTo: "Cleaner (Sunita)" },
+    { category: "ELECTRICITY", amount: 7800, day: 12, paidTo: "UPPCL" },
+    { category: "WATER", amount: 900, day: 8, paidTo: "Water tanker" },
+    { category: "INTERNET", amount: 1400, day: 5, paidTo: "Airtel Xstream" },
+    { category: "RENT", amount: 22000, day: 7, paidTo: "Building owner" },
+    { category: "MAINTENANCE", amount: 1500, day: 18, paidTo: "Plumber" },
   ] as const;
   for (const p of [m(-3), m(-2), m(-1), month]) {
     for (const e of expenseTemplate) {
