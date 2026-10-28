@@ -104,3 +104,10 @@ export function overlapDays(
   if (to < from) return 0;
   return Math.round((to - from) / DAY_MS) + 1;
 }
+
+/** 1st, 2nd, 3rd, 4th … 21st */
+export function ordinal(n: number): string {
+  const rem100 = n % 100;
+  const suffix = rem100 >= 11 && rem100 <= 13 ? "th" : ({ 1: "st", 2: "nd", 3: "rd" } as Record<number, string>)[n % 10] ?? "th";
+  return `${n}${suffix}`;
+}

@@ -38,6 +38,15 @@ async function staysInPeriod(client: Tx | typeof db, propertyId: string, period:
   });
 }
 
+/** How many tenants stayed during the period but have no invoice for it yet. */
+export async function uninvoicedCount(propertyId: string, period: string) {
+  const stays = await staysInPeriod(db, propertyId, period);
+  const tenantIds = [...new Set(stays.map((s) => s.tenantId))];
+  if (tenantIds.length === 0) return 0;
+  const invoiced = await db.invoice.count({ where: { propertyId, period, tenantId: { in: tenantIds } } });
+  return tenantIds.length - invoiced;
+}
+
 /**
  * Create one invoice per tenant who stayed in the property during `period`.
  * Rent is prorated by nights; unbilled electricity from earlier months is added.

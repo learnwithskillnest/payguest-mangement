@@ -61,11 +61,11 @@ export function Badge({ tone = "gray", children }: { tone?: keyof typeof badgeTo
 
 export function Field({ label, hint, children, className = "" }: { label: string; hint?: string; children: ReactNode; className?: string }) {
   return (
-    <div className={`flex flex-col gap-1.5 ${className}`}>
-      <label>{label}</label>
+    <label className={`flex flex-col gap-1.5 ${className}`}>
+      <span className="font-medium">{label}</span>
       {children}
-      {hint && <p className="text-xs text-stone-500">{hint}</p>}
-    </div>
+      {hint && <span className="text-xs text-stone-500">{hint}</span>}
+    </label>
   );
 }
 
