@@ -34,7 +34,7 @@ await check("/login", { contains: "Log in" });
 await check("/signup", { contains: "Set up your PG" });
 await check("/dashboard", { expect: 307 });
 await check("/dashboard", { cookie, contains: "To do" });
-await check("/rooms", { cookie, contains: "Room 101" });
+await check("/rooms", { cookie, contains: "Add a room" });
 await check("/tenants", { cookie, contains: tenant.name });
 await check("/tenants?tab=past", { cookie, contains: movedOut.name });
 await check("/tenants?tab=pending", { cookie });

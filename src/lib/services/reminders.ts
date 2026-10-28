@@ -119,6 +119,7 @@ export async function sendDueReminders(now: Date = new Date()) {
     for (const raw of invoices) {
       const inv = withBalance(raw, onDate);
       if (inv.balance <= 0) continue;
+      if (inv.claimedAt) continue; // tenant says they've paid; owner is confirming
       const last = inv.reminders[0]?.sentAt;
       const lastSentOn = last ? today(last) : null;
       if (

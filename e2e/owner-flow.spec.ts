@@ -34,7 +34,7 @@ test("owner sets up a PG, adds a tenant, bills rent and records a payment", asyn
 
   // Add a tenant from the first of the month
   await page.goto("/tenants/new");
-  await page.getByLabel("Bed", { exact: true }).selectOption({ index: 1 });
+  await page.getByRole("combobox", { name: /^Bed\b/ }).selectOption({ index: 1 });
   await page.getByLabel("Move-in date").fill(isoDate(periodStart(month)));
   await page.getByLabel("Full name").fill("Rahul Verma");
   await page.getByLabel("Mobile (WhatsApp)").fill("9876543210");
@@ -93,7 +93,7 @@ test("owner sets up a PG, adds a tenant, bills rent and records a payment", asyn
 
   // Expense and profit
   await page.goto("/expenses");
-  await page.getByLabel("Category").selectOption("FOOD");
+  await page.getByRole("combobox", { name: /^Category/ }).selectOption("FOOD");
   await page.getByLabel("Amount (₹)").fill("3000");
   await page.getByRole("button", { name: "Add expense" }).click();
   await expect(page.getByText("₹3,000 expense added.")).toBeVisible();

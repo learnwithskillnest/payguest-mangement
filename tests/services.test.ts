@@ -113,6 +113,11 @@ run("services (database)", () => {
     // The fully paid September invoice never gets a reminder
     const paid = await db.invoice.findUniqueOrThrow({ where: { tenantId_period: { tenantId: tenantIds.Full, period: "2026-09" } }, include: { reminders: true } });
     expect(paid.reminders).toHaveLength(0);
+    // A tenant with a pending "I've paid" claim is not chased
+    const joinerOct = await db.invoice.findUniqueOrThrow({ where: { tenantId_period: { tenantId: tenantIds.Joiner, period: "2026-10" } } });
+    await db.invoice.update({ where: { id: joinerOct.id }, data: { claimAmount: 100, claimRef: "123456", claimedAt: new Date() } });
+    await sendDueReminders(new Date("2026-10-08T04:00:00Z"));
+    expect(await db.reminder.count({ where: { invoiceId: joinerOct.id } })).toBe(1);
   });
 
   it("shows live bed states and monthly profit", async () => {
