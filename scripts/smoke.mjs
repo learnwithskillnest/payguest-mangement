@@ -46,7 +46,7 @@ await check(`/rent/${invoice.id}`, { cookie, contains: "Record payment" });
 await check(`/receipts/${payment.id}`, { cookie, contains: payment.receiptNo });
 await check("/electricity", { cookie, contains: "Meter readings" });
 await check("/expenses", { cookie, contains: "Add expense" });
-await check("/reports", { cookie, contains: "Last 12 months" });
+await check("/reports", { cookie, contains: "Month by month" });
 await check("/settings", { cookie, contains: "Rent collection" });
 await check(`/pay/${invoice.publicToken}`, { contains: "Pay" });
 await check(`/pay/${payment.invoice.publicToken}/receipt/${payment.id}`, { contains: payment.receiptNo });

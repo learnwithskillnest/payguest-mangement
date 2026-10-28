@@ -9,11 +9,14 @@ export const metadata = { title: "Profit" };
 
 export default async function ReportsPage() {
   const { property } = await requireOwner();
-  const rows = await monthlySummaries(property.id, currentPeriod(), 12);
+  const all = await monthlySummaries(property.id, currentPeriod(), 12);
+  // Hide empty months before the PG started using the app (keep at least the last two).
+  const firstActive = all.findIndex((r) => r.billed || r.collected || r.expenses);
+  const rows = all.slice(Math.min(firstActive === -1 ? all.length : firstActive, all.length - 2));
   const last = rows[rows.length - 1];
   const prev = rows[rows.length - 2];
-  const yearCollected = rows.reduce((s, r) => s + r.collected, 0);
-  const yearExpenses = rows.reduce((s, r) => s + r.expenses, 0);
+  const yearCollected = all.reduce((s, r) => s + r.collected, 0);
+  const yearExpenses = all.reduce((s, r) => s + r.expenses, 0);
   const max = Math.max(1, ...rows.map((r) => Math.max(r.collected, r.expenses)));
   const prevCats = Object.entries(prev.expensesByCategory).sort((a, b) => b[1] - a[1]);
 
@@ -29,7 +32,7 @@ export default async function ReportsPage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        <Card title="Last 12 months" className="lg:col-span-2">
+        <Card title="Month by month" className="lg:col-span-2">
           <div className="mb-3 flex gap-4 text-xs text-stone-500">
             <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm bg-brand-500" /> Collected</span>
             <span className="flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm bg-stone-400" /> Expenses</span>

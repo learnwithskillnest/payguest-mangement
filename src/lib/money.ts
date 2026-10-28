@@ -2,7 +2,8 @@ const inr = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 });
 
 /** ₹12,500 */
 export function rupees(amount: number | null | undefined): string {
-  return `₹${inr.format(amount ?? 0)}`;
+  const n = amount ?? 0;
+  return n < 0 ? `−₹${inr.format(-n)}` : `₹${inr.format(n)}`;
 }
 
 /** Parse a rupee amount typed by a user ("12,500", "12500.00"). Returns null if invalid. */

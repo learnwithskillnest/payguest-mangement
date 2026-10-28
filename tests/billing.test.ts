@@ -111,6 +111,11 @@ describe("upi + misc", () => {
     expect(whatsappNumber("09876543210")).toBe("919876543210");
     expect(whatsappNumber("123")).toBeNull();
   });
+  it("formats rupees in the Indian system", async () => {
+    const { rupees } = await import("@/lib/money");
+    expect(rupees(125000)).toBe("₹1,25,000");
+    expect(rupees(-2500)).toBe("−₹2,500");
+  });
   it("masks Aadhaar", () => {
     expect(maskAadhaar("1234 5678 9012")).toBe("XXXX-XXXX-9012");
   });

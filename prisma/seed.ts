@@ -143,13 +143,13 @@ async function main() {
   }
 
   const expenseTemplate = [
-    { category: "FOOD", amount: 21000, day: 3, paidTo: "Grocery wholesaler" },
-    { category: "STAFF_SALARY", amount: 12000, day: 1, paidTo: "Cook (Ramesh)" },
-    { category: "STAFF_SALARY", amount: 7000, day: 1, paidTo: "Cleaner (Sunita)" },
-    { category: "ELECTRICITY", amount: 7800, day: 12, paidTo: "UPPCL" },
+    { category: "FOOD", amount: 14000, day: 3, paidTo: "Grocery wholesaler" },
+    { category: "STAFF_SALARY", amount: 9000, day: 1, paidTo: "Cook (Ramesh)" },
+    { category: "STAFF_SALARY", amount: 6000, day: 1, paidTo: "Cleaner (Sunita)" },
+    { category: "ELECTRICITY", amount: 6500, day: 12, paidTo: "UPPCL" },
     { category: "WATER", amount: 900, day: 8, paidTo: "Water tanker" },
     { category: "INTERNET", amount: 1400, day: 5, paidTo: "Airtel Xstream" },
-    { category: "RENT", amount: 22000, day: 7, paidTo: "Building owner" },
+    { category: "RENT", amount: 15000, day: 7, paidTo: "Building owner" },
     { category: "MAINTENANCE", amount: 1500, day: 18, paidTo: "Plumber" },
   ] as const;
   for (const p of [m(-3), m(-2), m(-1), month]) {
