@@ -30,7 +30,7 @@ export default async function TenantPage({ params, searchParams }: { params: Pro
     where: { id, propertyId: property.id },
     include: {
       stays: { orderBy: { startDate: "desc" }, include: { bed: { include: { room: true } } } },
-      documents: { orderBy: { uploadedAt: "desc" } },
+      documents: { orderBy: { uploadedAt: "desc" }, omit: { data: true } },
       invoices: { orderBy: { period: "desc" }, include: invoiceInclude },
       electricityShares: { where: { invoiceId: null }, include: { meterReading: true } },
     },

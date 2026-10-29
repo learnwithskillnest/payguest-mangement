@@ -30,6 +30,12 @@ npm run dev
 
 Open http://localhost:3000. Demo login: `demo@pgmanager.in` / `demo1234`.
 
+## Deploy on Vercel
+
+1. Import the repo in Vercel and add a Neon Postgres database from the Storage tab, which sets `DATABASE_URL`.
+2. Add `CRON_SECRET` (any long random string). Optionally add `SEED_DEMO=1` to load the demo PG on each deploy.
+3. Deploy. The `vercel-build` script creates the tables, and `vercel.json` runs the reminder job daily at 9:00 IST.
+
 ## Automatic rent reminders
 
 Call `GET /api/cron/reminders` once a day with `Authorization: Bearer $CRON_SECRET`. You can use Vercel Cron, cron-job.org or a server crontab, ideally around 9 AM IST. The reminder schedule comes from each PG's settings. Delivery depends on `REMINDER_PROVIDER`:
@@ -61,7 +67,7 @@ The owner can also record cash or UPI payments directly. To confirm payments aut
 
 ## Notes for production
 
-- Uploaded documents are saved to `UPLOAD_DIR` on local disk and only served to the owner. On serverless hosts such as Vercel, move them to S3 or R2.
+- Uploaded documents (up to 5 MB each) are stored in the database and only served to the signed-in owner. If storage grows large, move them to S3 or R2.
 - Set `APP_URL` to your public URL so payment links in reminders work.
 - Money is stored in whole rupees. Dates are calendar dates, and "today" is calculated in IST.
 

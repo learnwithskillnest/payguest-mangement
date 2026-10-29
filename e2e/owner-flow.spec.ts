@@ -46,6 +46,18 @@ test("owner sets up a PG, adds a tenant, bills rent and records a payment", asyn
   await expect(page.getByText("added to room 101")).toBeVisible();
   await expect(page.getByLabel("ID number")).toHaveValue("XXXX-XXXX-9012");
 
+  // Upload an ID document and open it
+  await page.getByLabel("File").setInputFiles({
+    name: "aadhaar.png",
+    mimeType: "image/png",
+    buffer: Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==", "base64"),
+  });
+  await page.getByRole("button", { name: "Upload" }).click();
+  await expect(page.getByText("Document uploaded.")).toBeVisible();
+  const docHref = await page.getByRole("link", { name: /aadhaar\.png/ }).getAttribute("href");
+  const doc = await page.request.get(docHref!);
+  expect(doc.headers()["content-type"]).toBe("image/png");
+
   // Bed board shows the tenant
   await page.goto("/rooms");
   await expect(page.getByRole("link", { name: "Rahul Verma" })).toBeVisible();

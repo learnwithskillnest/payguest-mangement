@@ -13,7 +13,8 @@
     "db:seed": "tsx prisma/seed.ts",
     "smoke": "node scripts/smoke.mjs",
     "postinstall": "prisma generate",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "vercel-build": "prisma db push --skip-generate && (test \"$SEED_DEMO\" = 1 && tsx prisma/seed.ts || true) && next build"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

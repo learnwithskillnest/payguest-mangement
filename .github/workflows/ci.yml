@@ -24,7 +24,6 @@ jobs:
       DATABASE_URL: postgresql://pg:pg@localhost:5432/pgmanager
       APP_URL: http://localhost:3000
       CRON_SECRET: ci-secret
-      UPLOAD_DIR: ./uploads
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

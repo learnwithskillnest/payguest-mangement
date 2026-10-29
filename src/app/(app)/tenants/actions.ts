@@ -8,7 +8,7 @@ import { requireOwner } from "@/lib/auth";
 import { addDays, fmtDate, today } from "@/lib/dates";
 import { maskAadhaar } from "@/lib/billing";
 import { dateField, flash, optStr, rupeesField, str } from "@/lib/forms";
-import { deleteUpload, saveUpload } from "@/lib/uploads";
+import { readUploadedFile } from "@/lib/uploads";
 
 const POLICE = Object.values(PoliceVerification) as string[];
 const DOC_TYPES = Object.values(DocumentType) as string[];
@@ -54,7 +54,7 @@ async function bedFreeFrom(bedId: string, from: Date, ignoreStayId?: string) {
 async function maybeUpload(tenantId: string, fd: FormData, field: string, type: DocumentType) {
   const file = fd.get(field);
   if (!(file instanceof File) || file.size === 0) return;
-  const saved = await saveUpload(file);
+  const saved = await readUploadedFile(file);
   await db.document.create({ data: { tenantId, type, fileName: file.name, ...saved } });
 }
 
@@ -226,9 +226,11 @@ export async function uploadDocument(fd: FormData) {
 
 export async function deleteDocument(fd: FormData) {
   const { property } = await requireOwner();
-  const doc = await db.document.findFirst({ where: { id: str(fd, "documentId"), tenant: { propertyId: property.id } } });
+  const doc = await db.document.findFirst({
+    where: { id: str(fd, "documentId"), tenant: { propertyId: property.id } },
+    select: { id: true, tenantId: true },
+  });
   if (!doc) flash("/tenants", "error", "Document not found.");
   await db.document.delete({ where: { id: doc.id } });
-  await deleteUpload(doc.storedName);
   flash(`/tenants/${doc.tenantId}`, "msg", "Document deleted.");
 }

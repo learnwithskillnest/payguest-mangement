@@ -176,6 +176,7 @@ model Document {
   storedName String       @unique
   mimeType   String
   size       Int
+  data       Bytes        // file contents, kept in the database so it works on serverless hosts
   uploadedAt DateTime     @default(now())
 }
 
